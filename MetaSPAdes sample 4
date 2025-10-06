@@ -1,0 +1,37 @@
+  #!/bin/bash
+#SBATCH --job-name=MetaSPAdes_Wu_17_4
+#SBATCH --account=hwu
+#SBATCH --partition=kamiak
+#SBATCH --nodes=1
+#SBATCH --ntasks=48
+#SBATCH --time=7-00:00:00
+#SBATCH --mem=124G
+#SBATCH --output=logs/metaspades_Wu_17_4_%j.out
+#SBATCH --error=logs/metaspades_Wu_17_4_%j.err
+
+# Load SPAdes
+module load spades/3.15.3
+
+# Define directories
+workDir="/data/lab/hwu/Akhalil/viral_metagenome"
+readsDir="${workDir}/results"
+outDir="${workDir}/assemblies/MetaSPAdes_Wu_17_4"
+
+# Make sure output dir exists
+mkdir -p "${outDir}"
+
+# Input reads
+pe1="${readsDir}/Wu_17_4_R1_t_paired.fastq.gz"
+pe2="${readsDir}/Wu_17_4_R2_t_paired.fastq.gz"
+
+# Check that input reads exist
+if [[ ! -f "$pe1" || ! -f "$pe2" ]]; then
+    echo "Error: input reads not found!"
+    echo "Expected: $pe1 and $pe2"
+    exit 1
+fi
+
+# Run MetaSPAdes
+spades.py --meta -k 21,33,55,77,99,121 \
+    -1 "${pe1}" -2 "${pe2}" \
+    -o "${outDir}"
