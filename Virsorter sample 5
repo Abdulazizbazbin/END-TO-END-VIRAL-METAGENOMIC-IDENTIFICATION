@@ -1,0 +1,55 @@
+#!/bin/bash
+#SBATCH --job-name=VS2_Wu_17_5_p1
+#SBATCH --account=hwu
+#SBATCH --partition=kamiak
+#SBATCH --nodes=1
+#SBATCH --ntasks=40
+#SBATCH --time=168:00:00        # 7 days
+#SBATCH --mem=200G
+#SBATCH --output=/data/lab/hwu/Akhalil/viral_metagenome/logs/VirSorter2_Wu_17_5_p1_%j.out
+#SBATCH --error=/data/lab/hwu/Akhalil/viral_metagenome/logs/VirSorter2_Wu_17_5_p1_%j.err
+
+# ==============================================================
+# VirSorter2 Pass 1 for sample Wu_17_5
+# ==============================================================
+
+# Load Singularity module
+module load singularity
+
+# Path to VirSorter2 container
+vs2SIF="/data/lab/hwu/sifs/virsorter_2.2.4--pyhdfd78af_1.sif"
+
+# Working directories
+workDir="/data/lab/hwu/Akhalil/viral_metagenome"
+assemblyDir="${workDir}/assembly_results"
+outDir="${workDir}/analyses/Wu_17_5/VirSorter2-Pass1"
+
+# Create output directory
+mkdir -p "${outDir}"
+
+# Input assembly file
+input="${assemblyDir}/Wu_17_5_contigs.fasta"
+
+# Confirm input file exists
+if [[ ! -f "$input" ]]; then
+    echo "ERROR: Assembly file not found: $input"
+    exit 1
+fi
+
+# VirSorter2 options
+opts="--keep-original-seq \
+      --include-groups dsDNAphage,ssDNA \
+      --min-length 5000 \
+      --min-score 0.5 \
+      -j 40"
+
+# Run VirSorter2 inside Singularity
+echo "Running VirSorter2 for Wu_17_5..."
+singularity exec "${vs2SIF}" virsorter run \
+    -i "${input}" \
+    -w "${outDir}" \
+    --db-dir /data/lab/hwu/Akhalil/viral_metagenome/VirSorter2_latest/databases/db \
+    ${opts} all
+
+echo "VirSorter2 Pass 1 completed for Wu_17_5"
+echo "Results saved to: ${outDir}"
