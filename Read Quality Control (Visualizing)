@@ -1,0 +1,18 @@
+To run FASTQC on the trimmomatic results to check raw reads, Trimmomatic paired and unpaired outputs:
+We first download system installed FASTQC:
+module avail fastqc
+module load fastqc
+fastqc –version
+To run FASTQC on the Trimmomatic result: 
+mkdir -p fastqc_results
+
+for sample in {1..5}; do
+  fastqc \
+    /data/lab/hwu/Akhalil/viral_metagenome/raw_reads/Wu_17_${sample}_S${sample}_L001_R1_001.fastq.gz \
+    /data/lab/hwu/Akhalil/viral_metagenome/raw_reads/Wu_17_${sample}_S${sample}_L001_R2_001.fastq.gz \
+    /data/lab/hwu/Akhalil/viral_metagenome/results/Wu_17_${sample}_R1_t_paired.fastq.gz \
+    /data/lab/hwu/Akhalil/viral_metagenome/results/Wu_17_${sample}_R1_t_unpaired.fastq.gz \
+    /data/lab/hwu/Akhalil/viral_metagenome/results/Wu_17_${sample}_R2_t_paired.fastq.gz \
+    /data/lab/hwu/Akhalil/viral_metagenome/results/Wu_17_${sample}_R2_t_unpaired.fastq.gz \
+    --outdir /data/lab/hwu/Akhalil/viral_metagenome/fastqc_results
+done
